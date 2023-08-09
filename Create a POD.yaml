@@ -1,0 +1,25 @@
+#Task1: Create a pod
+
+Create a pod named pod-httpd using the image httpd with latest tag only and remember to mention tag i.e httpd:latest.
+Labels app should be named as httpd_app, also container should be named as httpd-container.
+
+#Steps:
+
+#Crate a POD with dry run options and output to a file with extension yaml
+
+kubectl run pod-httpd --image:httpd:latest --dry-run:client -o yaml > Task1.yaml
+
+#Edit the file with VI editor
+
+vi Task1.yaml
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-httpd
+   labels:
+     app: httpd_app
+spec:
+    containers:
+    - name: httpd-container
+      image: httpd:lates
