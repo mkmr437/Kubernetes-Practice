@@ -1,0 +1,29 @@
+#Checking Rollout History of a Deployment:
+#First, check the revisions of this Deployment:
+
+kubectl rollout history deployment/nginx-deployment
+
+#The output is similar to this:
+
+deployments "nginx-deployment"
+REVISION    CHANGE-CAUSE
+1           kubectl apply --filename=https://k8s.io/examples/controllers/nginx-deployment.yaml
+2           kubectl set image deployment/nginx-deployment nginx=nginx:1.16.1
+3           kubectl set image deployment/nginx-deployment nginx=nginx:1.161
+
+
+#Deployment annotation
+kubectl annotate deployment nginx-deployment kubernetes.io/chnage-cause="image updated to 16.1"
+
+#To  see the details of each revision, run:
+
+kubectl rollout history deployment/nginx-deployment --revision=2
+
+
+#Rolling Back to a Previous Revision
+
+kubectl rollout undo deployment/nginx-deployment
+
+#Alternatively, you can rollback to a specific revision by specifying it with --to-revision:
+
+kubectl rollout undo deployment/nginx-deployment --to-revision=2
