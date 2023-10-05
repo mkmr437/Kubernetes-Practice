@@ -1,0 +1,38 @@
+# Task2:
+#Create a deployment using nginx image with latest tag only and remember to mention the tag i.e nginx:latest. Name it as nginx-deployment. The container should be named as nginx-container, also make sure replica counts are 3.
+
+#Create a NodePort type service named nginx-service. The nodePort should be 30011.
+
+
+#nginx deploy
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: nginx-deployment
+  name: nginx-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx-deployment
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: nginx-deployment
+    spec:
+      containers:
+      - image: nginx:latest
+        name: nginx-container
+        resources: {}
+status: {}
+
+
+#Service
+
+kubectl expose deployment nginx-deployment --name=nginx-service --type=NodePort --port=80 --target-port=80 --node-port=30011
+
