@@ -1,0 +1,81 @@
+# Task:
+Create a deployment and rollout and rollback to previous version
+Also expose deployment with type nodePort
+
+# Deployemt 
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: httpd-deploy
+  name: httpd-deploy
+  namespace: nautilus
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: httpd-deploy
+  strategy: 
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 2
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: httpd-deploy
+    spec:
+      containers:
+      - image: httpd:2.4.25
+        name: httpd
+        resources: {}
+status: {}
+
+
+# Nodeport Service
+
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: httpd-deploy
+  name: httpd-service
+  namespace: nautilus
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+    nodePort: 30008
+  selector:
+    app: httpd-deploy
+  type: NodePort
+status:
+  loadBalancer: {}
+
+
+# Commands
+
+# Create a namespace called nautilus    
+kubectl create ns nautilus
+
+# With dryrun command create a deployment and make changes   
+kubectl create deployment httpd-deploy --image=httpd:2.4.25 --replicas=4 -n nautilus -o yaml --dry-run=client > httpd.yaml
+
+kubectl apply -f httpd.yaml 
+  
+kubectl expose deployment -n nautilus httpd-deploy --type=NodePort --name=httpd-service  --port=80 -o yaml --dry-run=client > httpdsvc.yaml
+
+kubectl edit deployments.apps -n nautilus httpd-deploy 
+ 
+kubectl rollout status deployment -n nautilus httpd-deploy 
+kubectl rollout history deployment -n nautilus httpd-deploy 
+  
+  
+kubectl rollout history deployment -n nautilus httpd-deploy --revision=1
+kubectl rollout history deployment -n nautilus httpd-deploy --revision=2
+kubectl rollout history deployment -n nautilus httpd-deploy --revision=3
+kubectl annotate deployments.apps -n nautilus httpd-deploy kubernetes.io/change-cause="image roolback to httpd:2.5.25"
