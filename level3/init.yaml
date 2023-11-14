@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: ic-deploy-devops
+  name: ic-deploy-devops
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ic-devops
+  template:
+    metadata:
+      labels:
+        app: ic-devops
+    spec:
+      containers:
+      - image: fedora:latest
+        name: ic-main-devops
+        command: ['/bin/bash', '-c', 'while true; do cat /ic/ecommerce; sleep 5; done']
+        volumeMounts:
+        - name: ic-volume-devops
+          mountPath: /ic
+      initContainers:
+      - name: ic-msg-devops
+        image: fedora:latest
+        command: ['/bin/bash', '-c', 'echo Init Done - Welcome to xFusionCorp Industries > /ic/ecommerce']
+        volumeMounts:
+        - name: ic-volume-devops
+          mountPath: /ic
+      volumes:
+      - name: ic-volume-devops
+        emptyDir:
+         sizeLimit: 500Mi
